@@ -1,0 +1,34 @@
+config {
+    schema: "staging",
+    type: "table",
+    tags: ["staging_to_warehouse"],
+    bigquery: {
+        labels: {
+            layer: "staging"
+        },
+    },
+    description: "Staging view with details on messages",
+    columns: {
+        message_id: project_docs.message_id,
+        message_description: project_docs.message_description,
+        sender: project_docs.sender,
+        sender_email: project_docs.sender_email,
+        source_partition_timestamp: project_docs.source_partition_timestamp,
+        insertion_timestamp: project_docs.insertion_timestamp
+    }
+}
+
+-- base CTE
+-- use a function to filter out bad values
+WITH example_base AS (
+    SELECT
+        message_id,
+        message_description,
+        sender,
+        sender_email,
+        source_partition_timestamp 
+    FROM ${ref("dl_example_generated")}   
+    WHERE message_id <> CAST(${project_constants.FAULTY_ID} AS STRING)
+)
+
+${generic_functions.addInsertionTimestamp("example_base")}

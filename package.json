@@ -1,0 +1,6 @@
+{
+  "name": "dataform-elt-template-github",
+  "dependencies": {
+    "@dataform/core": "2.8.0"
+  }
+}

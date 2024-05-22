@@ -1,0 +1,39 @@
+config {
+    schema: "warehouse",
+    type: "table",
+    tags: ["warehouse"],
+    bigquery: {
+        labels: {
+            layer: "warehouse"
+        },
+        partitionBy: "DATE(source_partition_timestamp)"
+    },
+    description: "Warehouse table with details on messages",
+    columns: {
+        message_id: project_docs.message_id,
+        message_description: project_docs.message_description,
+        source_partition_timestamp: project_docs.source_partition_timestamp,
+        insertion_timestamp: project_docs.insertion_timestamp
+    },
+    assertions: {
+        uniqueKey: ["message_id"]
+    }
+}
+
+-- Get examples with row number in partition descending order
+WITH example_with_row_num AS (
+    SELECT 
+        * EXCEPT(insertion_timestamp),
+        ROW_NUMBER() OVER (PARTITION BY message_id ORDER BY source_partition_timestamp DESC) as row_num
+    FROM ${ref("example")}
+),
+
+-- Filter to show only latest data
+example_latest AS (
+    SELECT
+        * EXCEPT (row_num)
+    FROM example_with_row_num
+    WHERE row_num = 1    
+)
+
+${generic_functions.addInsertionTimestamp("example_latest")}

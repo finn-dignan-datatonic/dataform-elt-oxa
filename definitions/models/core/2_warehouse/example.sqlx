@@ -1,0 +1,36 @@
+config {
+    schema: "warehouse",
+    type: "incremental",
+    uniqueKey: ["message_id", "message_description"],
+    protected: true,
+    tags: ["warehouse"],
+    bigquery: {
+        labels: {
+            layer: "warehouse"
+        },
+        partitionBy: "DATE(source_partition_timestamp)"
+    },
+    description: "Warehouse table with details on messages",
+    columns: {
+        message_id: project_docs.message_id,
+        message_description: project_docs.message_description,
+        sender: project_docs.sender,
+        sender_email: project_docs.sender_email,
+        source_partition_timestamp: project_docs.source_partition_timestamp,
+        insertion_timestamp: project_docs.insertion_timestamp
+    },
+    assertions: {
+        uniqueKey: ["message_id"]
+    }
+}
+
+-- base CTE
+WITH example_base AS (
+    SELECT
+        message_id,
+        message_description,
+        source_partition_timestamp 
+    FROM ${ref("stg_example")}
+)
+
+${generic_functions.addInsertionTimestamp("example_base")}

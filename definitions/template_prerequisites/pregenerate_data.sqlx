@@ -1,0 +1,30 @@
+config {
+    type: "operations",
+    tags: ["template_prerequisites"]
+}
+
+CREATE SCHEMA IF NOT EXISTS `datatonic-analytics-sandbox`.dl_example_for_dbt;
+
+CREATE OR REPLACE TABLE `dl_example_for_dbt`.dl_example_generated
+PARTITION BY TIMESTAMP_trunc(source_partition_timestamp, day)
+AS
+SELECT
+    '001' AS message_id,
+    'This is a test' AS message_description,
+    'Ash Sultan' AS sender,
+    'ashiq.sultan@datatonic.com' AS sender_email,
+    TIMESTAMP('2020-04-01') AS source_partition_timestamp
+UNION ALL 
+SELECT
+    '002' AS message_id,
+    'This is another test' AS message_description,
+    'Ash Sultan' AS sender,
+    'ashiq.sultan@datatonic.com' AS sender_email,
+    TIMESTAMP('2021-04-01') AS source_partition_timestamp
+UNION ALL 
+SELECT
+    '002' AS message_id,
+    'This is another test, with update' AS message_description,
+    'Andy Powell' AS sender,
+    'andrew.powell@datatonic.com' AS sender_email,
+    TIMESTAMP('2021-04-17') AS source_partition_timestamp

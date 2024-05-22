@@ -1,0 +1,7 @@
+{
+  "defaultSchema": "dataform_template_demo",
+  "assertionSchema": "dataform_template_demo_assertions",
+  "warehouse": "bigquery",
+  "defaultDatabase": "datatonic-analytics-sandbox",
+  "defaultLocation": "EU"
+}
